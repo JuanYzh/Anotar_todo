@@ -2,6 +2,7 @@
 # Copyright (c) 2023 by wen-Huan.
 # Date: 2023-03.01
 #   - Ich, Liam und google :) ==> tío, esto es para ti
+import os.path
 import tkinter as tk
 import tkinter.ttk as ttk
 import windnd
@@ -19,9 +20,11 @@ class AnotarTodo:
 
         # ========================================== tk weights
         # Define the left Treeview
-        self.tree = ttk.Treeview(self.master, columns=("path",))
-        self.tree.heading("#0", text="File Name")
+        self.tree = ttk.Treeview(self.master, columns=("filename", "path"))
+        self.tree.heading("#0", text="item")
+        self.tree.heading("filename", text="File Name")
         self.tree.heading("path", text="Path")
+        self.tree.column("#0", width=50)
         self.tree.column("path", width=400)
         self.tree.grid(row=0, column=0, sticky="nsew")
         self.tree.bind("<ButtonRelease-1>", self.on_select)
@@ -75,7 +78,7 @@ class AnotarTodo:
         self.save_file_map()
 
         # Display prompt message
-        if messagebox.askokcancel("Exit", "Are you sure you want to exit?"):
+        if True: # messagebox.askokcancel("Exit", "Are you sure you want to exit?"):
             self.master.destroy()
 
     def load_file_map(self):
@@ -91,7 +94,8 @@ class AnotarTodo:
 
         for path, file_info in self.file_map.items():
             if not self.tree.exists(file_info['display']):
-                self.tree.insert("", "end", text=file_info['display'], values=(file_info['display'], path))
+                is_file = "F" if os.path.isfile(path) else "D"
+                self.tree.insert("", "end", text=is_file, values=(file_info['display'], path))
 
     def save_file_map(self):
         """save file map."""
@@ -109,7 +113,8 @@ class AnotarTodo:
                 if path not in self.file_map:
                     display_name = path.split('\\')[-1]
                     self.file_map.update({path:{'display': display_name, 'note': ''}})
-                    self.tree.insert("", "end", text=display_name, values=(display_name, path))
+                    is_file = "F" if os.path.isfile(path) else "D"
+                    self.tree.insert("", "end", text=is_file, values=(display_name, path))
             except Exception as error:
                 messagebox.showerror("Error", f"oooops！an error occurred: {error}")
         return True
